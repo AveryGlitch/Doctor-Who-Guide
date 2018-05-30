@@ -1,0 +1,91 @@
+th {
+	  background-color: dimgray;
+    color: white;
+}
+
+table, tr, td {
+    border: none;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+td.maintable {
+    min-width: 100px;
+}
+
+
+tr:nth-child(odd) {
+    background-color: #E8E8E8;
+}
+
+tr:nth-child(even) {
+    background-color: #C0C0C0;
+}
+
+tr.info {
+    background-color: white;
+    font-size: x-small;
+}
+
+p.name {
+    font-weight: bold;
+}
+
+p.name-missing {
+    font-weight: bold;
+    font-style: italic;
+}
+
+table.details {
+    border: none;
+}
+tr.details {
+    border: none;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+td.details {
+    border: none;
+}
+
+tr.season {
+    background-color: aliceblue;
+    border-top: 2px solid black;
+}
+
+tr.intro {
+    background-color: white;
+}
+
+td.details-tag {
+    font-size: small;
+}
+
+td.details-text {
+    font-size: small;
+    font-style: italic;
+}
+
+div {
+    border-radius: 3px;
+    padding: 2px;
+}
+
+td.No, div.No {
+    background-color: #E0C0C0;
+}
+span.Partial, td.Partial, div.Partial {
+    background-color: #ffffc0;
+}
+td.Maybe, div.Maybe
+{
+    background-color: #ffc0ff;
+}
+td.Yes, div.Yes
+{
+    background-color: #c0c0ff;
+}
+td.Highly, div.Highly
+{
+    background-color: #c0ffff;
+}
+
