@@ -102,7 +102,7 @@ postamble = "</body></html>"
 tableHeading = "<table class=\"maintable\"><tr><th>Story</th><th>Watch?</th><th>Details</th></tr>\n"
 
 output :: Table -> String
-output table = preamble ++ introduction ++ output' table ++ postamble
+output table = preamble ++ introduction ++ output' table ++ outro ++ postamble
   where
     output' [] = ""
     output' (Doctor n seasons : rest)
@@ -262,7 +262,12 @@ introduction
     ++ p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
     ++ p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
     ++ "<hr>"
-
+outro = h1 "Acknowledgements"
+        ++ p "Thanks to <a href=\"https://mastodon.social/@The_T\">@The_T@mastodon.social</a> for convincing me to upgrade the recommendations for The Aztects, The Sensorites, and the Reign of Terror; As well as downgrading the Edge of Destruction"
+        ++ p "Thanks to <a href=\"https://computerfairi.es/@nezumi\">@nezumi@computerfairi.es</a> for making the downgrade of The Edge of Destruction more solid, by pointing out how the plot contrivances make everyone act out of character"
+        ++ p "Thanks to <a href=\"https://wandering.shop/@DialMForMara\">@DialMForMara@wandering.shop</a> for convincing me to review the reconstructions as well"
+        ++ p "And a bunch of others on the fediverse for helping me make the colourscheme in this document less garish."
+        ++ p "This guide was not created manually, but was (somewhat) automated with a program I made one afternoon. You can find the source for it <a href=\"https://github.com/AveryGlitch/Doctor-Who-Guide\">on my github</a>"
 
 h1,p, tr :: String -> String
 h1 string = "<h1>" ++ string ++ "</h1>"
