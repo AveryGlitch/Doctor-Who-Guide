@@ -3,6 +3,7 @@ module Main where
 
 import System.Environment (getArgs)
 import System.Directory (renameFile)
+import Prelude hiding (div)
 
 -- First some types to make signatures more readable
 type Name = String
@@ -102,51 +103,54 @@ postamble = "</body></html>"
 tableHeading = "<table class=\"maintable\"><tr><th>Story</th><th>Watch?</th><th>Details</th></tr>\n"
 
 output :: Table -> String
-output table = preamble ++ introduction ++ output' table ++ outro ++ postamble
+output table = preamble +. introduction +. output' table +. outro +. postamble
   where
     output' [] = ""
     output' (Doctor n seasons : rest)
-      = "<h1>" ++ ordinal n ++ " Doctor</h1>\n"
-      ++ tableHeading ++ concatMap outputSeason seasons ++ "</table>"
-      ++ output' rest
+      = h1 (ordinal n ++ " Doctor")
+      +. tableHeading +. concatMap outputSeason seasons +. "</table>"
+      +. output' rest
 
 outputSeason :: Season -> String
 outputSeason (Season num stories)
-  = "<tr class=\"season\"><td colspan=3>Season " ++ num ++ "</td></tr>\n"
-    ++ concatMap outputStory stories
+  = tr' "season" ("<td colspan=3>Season " ++ num ++ "</td>")
+    +. concatMap outputStory stories
 
 outputStory :: Story -> String
 outputStory (Story name number numEps missing recc note synopsis review)
-  = "<tr class=name><td>\n"
-    ++ "<p class="
-    ++ (if missing == None then "name" else "name-missing")
-    ++ ">" ++ name ++ "</p>\n"
-    ++ "<table><tr class=info><td>Story Number</td><td>" ++ show number ++ "</td></tr>\n"
-    ++ "<tr class=info><td>Number of Episodes</td><td>" ++ show numEps  ++ "</td></tr>\n"
-    ++ case missing of
-         None -> ""
-         All  -> "<tr class=info><td>Missing Episodes?</td><td>Yes: all</td></tr>\n"
-         Some eps -> "<tr class=info><td>Missing Episodes?</td><td>Yes: "
-                     ++ showEps eps
-                     ++ "</td></tr>\n"
-    ++ "</table></td>\n"
-    ++ "<td><div class=\"" ++ show recc ++ "\">"
-    ++ case recc of
-         Highly -> "✨ Highly Recommended ✨"
-         Yes    -> "Watch"
-         Maybe  -> "Maybe"
-         Partial-> "Partial watch"
-         No     -> "Don't watch"
-    ++ case note of
-         Just note' -> ", " ++ note'
-         Nothing -> ""
-    ++ "</div></td>\n"
-    ++ "<td><table class=details>"
-    ++ "<tr class=details><td class=details-tag>Synopsis</td>"
-    ++ "<td class=details-text>" ++ synopsis ++ "</td></tr>\n"
-    ++ "<tr class=details><td class=details-tag>Review</td>"
-    ++ "<td class=details-text>" ++ review ++ "</td></tr></table>\n"
-    ++ "</td></tr>\n"
+  = tr' "name"
+    (td
+        ("<p class="
+         ++ (if missing == None then "name" else "name-missing")
+         ++ ">" ++ name ++ "</p>"
+         +. "<table>"
+         +. tr' "info" (td "Story Number" ++ td (show number))
+         +. tr' "info" (td "Number of Episodes" ++ td (show numEps))
+         +. case missing of
+              None -> ""
+              All  -> tr' "info" (td "Missing Episodes?" ++ td "Yes: all")
+              Some eps -> tr' "info" (td "Missing Episodes?" ++ td ("Yes: " ++ showEps eps))
+         +. "</table>\n")
+    +. td (div (show recc)
+            (
+              (case recc of
+                 Highly -> "✨ Highly Recommended ✨"
+                 Yes    -> "Watch"
+                 Maybe  -> "Maybe"
+                 Partial-> "Partial watch"
+                 No     -> "Don't watch"
+              )
+              ++ (case note of
+                    Just text -> ", " ++ text
+                    Nothing   -> ""
+                 )
+            )
+          )
+    +. td ("<table class=details>"
+           +. tr' "details" (td' "details-tag" "Synopsis" ++ td' "details-text" synopsis)
+           +. tr' "details" (td' "details-tag" "Review"   ++ td' "details-text" review)
+           +. "</table>"))
+    ++ "\n"
 
 showEps :: [Int] -> String
 showEps [] = "none"
@@ -233,9 +237,9 @@ prompt :: String -> IO String
 prompt text = putStr text >> getLine >>= return
 
 file, tmpfile, backup :: FilePath
-file = "/home/avery/.DrWhoDB"
-tmpfile = "/home/avery/.DrWhoDB_tmp"
-backup = "/home/avery/.DrWhoDB.bak"
+file = "DrWhoDB"
+tmpfile = "DrWhoDB_tmp"
+backup = "DrWhoDB.bak"
 
 
 writeOut :: Table -> IO ()
@@ -243,36 +247,71 @@ writeOut table = do writeFile tmpfile (show table)
                     renameFile file backup
                     renameFile tmpfile file
 
+-- | Concats two strings, but puts a newline between them
+(+.) :: String -> String -> String
+x +. y = x ++ "\n" ++ y
 
+h1, h2, h3, p, tr, td, li :: String -> String
+h1  = simplehtml "h1"
+h2  = simplehtml "h2"
+h3  = simplehtml "h2"
+p   = simplehtml "p"
+tr  = simplehtml "tr"
+td  = simplehtml "td"
+li  = simplehtml "li"
+tr', td', div :: String -> String -> String
+tr' = styledhtml "tr"
+td' = styledhtml "td"
+div = styledhtml "div"
+
+a :: String -> String -> String
+a link name = "<a href=\"" ++ link ++ "\">" ++ name ++ "</a>"
+
+
+simplehtml :: String -> (String -> String)
+simplehtml tag = \s -> "<" ++ tag ++ ">" ++ s ++ "</" ++ tag ++ ">"
+styledhtml :: String -> String -> (String -> String)
+styledhtml tag style = \s -> "<" ++ tag ++ " class=\"" ++ style ++ "\">"++ s ++ "</" ++ tag ++ ">"
+
+
+
+
+ 
+introduction :: String
 introduction
   = h1 "Avery's Doctor Who Guide"
-    ++ p "So, you want to watch Doctor Who, through the classic and modern era, but you're not so sure on how much to watch? You've come to the right place! This guide has several different tracks, depending on what you're interested in"
-    ++ "<table>"
-    ++ tr (td (Just "Highly") "Fast Track"
-           ++ td Nothing "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
-    ++ tr (td (Just "Yes") "Recommended Track"
-           ++ td Nothing "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
-    ++ tr (td (Just "Maybe") "Maybe Track"
-          ++ td Nothing "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
-    ++ tr (td (Just "No") "Avoid"
-          ++ td Nothing "These episodes are only recommended if you're truly curious and dedicated.")
-    ++ "</table>"
-    ++ p "Additionally, some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes."
-    ++ p "Many of the early episodes are missing. You will be able to tell which ones these are because the name of the story will be in italics, and it will be mentioned several times. These stories aren't unwatchable, surprisingly - reconstructions of the episodes have been made, and they are (relatively) watchable. If you don't want to watch the reconstuctions, though (and I don't blame you), they are easy to skip."
-    ++ p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
-    ++ p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
-    ++ "<hr>"
-outro = h1 "Acknowledgements"
-        ++ p "Thanks to <a href=\"https://mastodon.social/@The_T\">@The_T@mastodon.social</a> for convincing me to upgrade the recommendations for The Aztects, The Sensorites, and the Reign of Terror; As well as downgrading the Edge of Destruction"
-        ++ p "Thanks to <a href=\"https://computerfairi.es/@nezumi\">@nezumi@computerfairi.es</a> for making the downgrade of The Edge of Destruction more solid, by pointing out how the plot contrivances make everyone act out of character"
-        ++ p "Thanks to <a href=\"https://wandering.shop/@DialMForMara\">@DialMForMara@wandering.shop</a> for convincing me to review the reconstructions as well"
-        ++ p "And a bunch of others on the fediverse for helping me make the colourscheme in this document less garish."
-        ++ p "This guide was not created manually, but was (somewhat) automated with a program I made one afternoon. You can find the source for it <a href=\"https://github.com/AveryGlitch/Doctor-Who-Guide\">on my github</a>"
+    +. p "So, you want to watch Doctor Who, through the classic and modern era, but you're not so sure on how much to watch? You've come to the right place! This guide has several different tracks, depending on what you're interested in"
+    +. "<table>"
+    +. concatMap (tr' "intro")
+    [
+      (td' "Highly" "Fast Track"
+           ++ td "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
+    , (td' "Yes" "Recommended Track"
+           ++ td "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
+    , (td' "Maybe" "Maybe Track"
+          ++ td "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
+    , (td' "No" "Avoid"
+          ++ td "These episodes are only recommended if you're truly curious and dedicated.")
+    ]
+    +. "</table>"
+    +. p "Additionally, some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes."
+    +. p "Many of the early episodes are missing. You will be able to tell which ones these are because the name of the story will be in italics, and it will be mentioned several times. These stories aren't unwatchable, surprisingly - reconstructions of the episodes have been made, and they are (relatively) watchable. If you don't want to watch the reconstuctions, though (and I don't blame you), they are easy to skip."
+    +. p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
+    +. p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
+    +. "<hr>"
 
-h1,p, tr :: String -> String
-h1 string = "<h1>" ++ string ++ "</h1>"
-p string = "<p>" ++ string ++ "</p>"
-tr string = "<tr class=intro>" ++ string ++ "</tr>"
-td :: Maybe String -> String -> String
-td Nothing string = "<td>" ++ string ++ "</td>"
-td (Just style) string = "<td class=" ++ style ++ ">" ++ string ++ "</td>"
+outro :: String
+outro = "<hr>"
+        +. div "dimbox" (
+          h3 "Acknowledgements"
+          +. p "Thanks to:"
+          +. "<ul>"
+          +. li (a "https://mastodon.social/@The_T" "@The_T@mastodon.social" ++ " for convincing me to upgrade the recommendations for The Aztecs, The Sensorites, and The Reign of Terror; as well as downgrading The Edge of Destruction")
+          +. li (a "https://computerfairi.es/@nezumi" "@nezumi@computerfairi.es" ++ " for making the downgrade of The Edge of Destruction more solid, by pointing out how the plot contrivances make everyone act out of character")
+          +. li (a "https://wandering.shop/@DialMForMara" "@DialMForMara@wandering.shop" ++ " for convincing me to review the reconstructions as well")
+          +. li "And a bunch of others on the fediverse for helping me make the colourscheme in this document less garish."
+          +. "</ul>"
+          +. p ("This guide was not created manually, but was (somewhat) automated with a program I made one afternoon. You can find the source for it " ++  a "https://github.com/AveryGlitch/Doctor-Who-Guide" "on my github")
+        )
+
+
