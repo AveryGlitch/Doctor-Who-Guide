@@ -7,6 +7,7 @@ table, tr, td {
     border: none;
     border-collapse: collapse;
     padding: 5px;
+    margin: 1%;
 }
 
 td.maintable {
@@ -89,3 +90,14 @@ td.Highly, div.Highly
     background-color: #c0ffff;
 }
 
+
+hr {
+    border-top: 3px double #8c8b8b;
+}
+
+div.dimbox {
+    background-color: lightgrey;
+    border: 1px dotted grey;
+    padding: 5px;
+    margin: 5%;
+}
