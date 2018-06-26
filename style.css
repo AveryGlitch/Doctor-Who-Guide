@@ -1,3 +1,16 @@
+body {
+    background-color: AntiqueWhite;
+}
+
+
+p.name {
+    font-weight: bold;
+}
+
+p.name-missing {
+    font-weight: bold;
+    font-style: italic;
+}
 th {
 	  background-color: dimgray;
     color: white;
@@ -10,7 +23,13 @@ table, tr, td {
     margin: 1%;
 }
 
-td.maintable {
+.invisible {
+    background-color: AntiqueWhite;
+    border-bottom: 1px dotted black;
+    border-top: 1px dotted black;
+}
+
+.maintable {
     min-width: 100px;
 }
 
@@ -28,14 +47,7 @@ tr.info {
     font-size: x-small;
 }
 
-p.name {
-    font-weight: bold;
-}
 
-p.name-missing {
-    font-weight: bold;
-    font-style: italic;
-}
 
 table.details {
     border: none;
@@ -69,23 +81,24 @@ td.details-text {
 div {
     border-radius: 3px;
     padding: 2px;
+    font-weight: normal;
 }
 
-td.No, div.No {
-    background-color: #E0C0C0;
+.No {
+    background-color: #cd9898;
 }
-span.Partial, td.Partial, div.Partial {
+.Partial {
     background-color: #ffffc0;
 }
-td.Maybe, div.Maybe
+.Maybe
 {
-    background-color: #ffc0ff;
+    background-color: #ff99ff;
 }
-td.Yes, div.Yes
+.Yes
 {
-    background-color: #c0c0ff;
+    background-color: #ccccff;
 }
-td.Highly, div.Highly
+.Highly
 {
     background-color: #c0ffff;
 }
@@ -95,9 +108,38 @@ hr {
     border-top: 3px double #8c8b8b;
 }
 
-div.dimbox {
-    background-color: lightgrey;
+.dimbox {
+    background-color: Bisque;
     border: 1px dotted grey;
     padding: 5px;
     margin: 5%;
+}
+
+.return {
+    padding: 5px;
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: center;
+}
+
+.return a {
+    border: 1px dotted grey;
+    padding: 1em;
+    background-color: Bisque;
+}
+
+.return a:hover {
+    color: Bisque;
+    background-color: Purple;
+}
+
+img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 5%;
+    float: right;
+}
+
+h1 {
+    display: inline-block;
 }

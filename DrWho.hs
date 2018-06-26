@@ -107,7 +107,9 @@ output table = preamble +. introduction +. output' table +. outro +. postamble
   where
     output' [] = ""
     output' (Doctor n seasons : rest)
-      = h1 (ordinal n ++ " Doctor")
+      = "<a name=\"doctor" ++ show n ++ "\"></a>"
+      +. h1 (ordinal n ++ " Doctor") ++ img ("../images/doctor-who/doctor" ++ show n ++ ".png") ("The " ++ ordinal n ++ " Doctor")
+      +. if length rest > 0 then "<span style=\"font-size: small; text-align: right\">" ++ a ("#doctor" ++ show (n + 1)) " ↩ next doctor" ++ "</span>" else ""
       +. tableHeading +. concatMap outputSeason seasons +. "</table>"
       +. output' rest
 
@@ -181,6 +183,15 @@ ordinal n = case n of
               19 -> "Nineteenth"
               _  -> error "I haven't accounted for this many doctors"
 
+toc :: Table -> String
+toc [] = ""
+toc table = h1 "Table of Contents"
+            +. "<ol>" +. toc' table +. "</ol>"
+            +. "<hr>"
+  where
+    toc' [] = ""
+    toc' (Doctor n _ : rest) = li $ a ("#doctor" ++ show n) (ordinal n ++ " Doctor")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -190,45 +201,50 @@ ordinal n = case n of
 data Command = Output | AddDoctor | AddSeason | AddStory | Usage
 
 -- | Run a command on a table
-run :: Command -> Table -> IO ()
-run Usage _         = do putStrLn "dw Output     : outputs the table as html"
+run :: Command -> Maybe FilePath -> Table -> IO ()
+run Usage _ _       = do args <- getArgs
+                         putStrLn $ "did not recognise args: " ++ concat args
+                         putStrLn "dw Output     : outputs the table as html"
                          putStrLn "dw add doctor : adds a new doctor to the table"
                          putStrLn "dw add season : adds a new season to the table (interactive)"
                          putStrLn "dw add story  : adds a new story to the table (interactive)"
                          putStrLn "dw edit story : edit a particular story"
                          putStrLn ""
                          putStrLn $ "The table is stored in " ++ file
-run Output table    = putStrLn $ output table
-run AddDoctor table = do writeOut $ addDoctor table
-run AddSeason table = do doctor <- prompt "To doctor: "
-                         season <- prompt "Season Number: "
-                         let result = addSeason (read doctor) season table
-                         case result of
-                           Just newTable -> do writeOut newTable
-                           Nothing -> print "couldn't add season!"
-run AddStory table  = do season <- prompt "Season Number: "
-                         name <- prompt "Name: "
-                         number <- prompt "Number: "
-                         numEpisodes <- prompt "Number of Episodes: "
-                         missing <- prompt "Missing: "
-                         recommendation <- prompt "Recommendation: "
-                         note <- prompt "Note: "
-                         synopsis <- prompt "Synopsis: "
-                         review <- prompt "Review: "
-                         let result = addStory (Story name (read number) (read numEpisodes) (read missing) (read recommendation) (read note) synopsis review) season table
-                         case result of
-                           Just newTable -> do writeOut newTable
-                           Nothing       -> print "couldn't add story!"
+run Output Nothing table           = putStrLn $ output table
+run Output (Just outputFile) table = writeFile outputFile (output table)
+run AddDoctor _ table = do writeOut $ addDoctor table
+run AddSeason _ table = do doctor <- prompt "To doctor: "
+                           season <- prompt "Season Number: "
+                           let result = addSeason (read doctor) season table
+                           case result of
+                             Just newTable -> do writeOut newTable
+                             Nothing -> print "couldn't add season!"
+run AddStory _ table  = do season <- prompt "Season Number: "
+                           name <- prompt "Name: "
+                           number <- prompt "Number: "
+                           numEpisodes <- prompt "Number of Episodes: "
+                           missing <- prompt "Missing: "
+                           recommendation <- prompt "Recommendation: "
+                           note <- prompt "Note: "
+                           synopsis <- prompt "Synopsis: "
+                           review <- prompt "Review: "
+                           let result = addStory (Story name (read number) (read numEpisodes) (read missing) (read recommendation) (readNote note) synopsis review) season table
+                           case result of
+                             Just newTable -> do writeOut newTable
+                             Nothing       -> print "couldn't add story!"
+
 
 main :: IO ()
 main = do arg <- getArgs
           fileContent <- readFile file
           pure (read fileContent) >>= case arg of
-            ["output"]        -> run Output
-            ["add", "doctor"] -> run AddDoctor
-            ["add", "season"] -> run AddSeason
-            ["add", "story"]  -> run AddStory
-            _                 -> run Usage
+            ["output"]        -> run Output Nothing
+            ["output", outputFile]   -> run Output (Just outputFile)
+            ["add", "doctor"] -> run AddDoctor Nothing
+            ["add", "season"] -> run AddSeason Nothing
+            ["add", "story"]  -> run AddStory Nothing
+            _                 -> run Usage Nothing
 
 
 
@@ -240,6 +256,11 @@ file, tmpfile, backup :: FilePath
 file = "DrWhoDB"
 tmpfile = "DrWhoDB_tmp"
 backup = "DrWhoDB.bak"
+
+
+readNote :: String -> Maybe Note
+readNote ""   = Nothing
+readNote note = Just note
 
 
 writeOut :: Table -> IO ()
@@ -267,6 +288,9 @@ div = styledhtml "div"
 a :: String -> String -> String
 a link name = "<a href=\"" ++ link ++ "\">" ++ name ++ "</a>"
 
+img :: String -> String -> String
+img url alt = "<img src=\"" ++ url ++ "\" alt=\"" ++ alt ++ "\">"
+
 
 simplehtml :: String -> (String -> String)
 simplehtml tag = \s -> "<" ++ tag ++ ">" ++ s ++ "</" ++ tag ++ ">"
@@ -276,7 +300,6 @@ styledhtml tag style = \s -> "<" ++ tag ++ " class=\"" ++ style ++ "\">"++ s ++ 
 
 
 
- 
 introduction :: String
 introduction
   = h1 "Avery's Doctor Who Guide"
@@ -285,19 +308,24 @@ introduction
     +. concatMap (tr' "intro")
     [
       (td' "Highly" "Fast Track"
-           ++ td "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
+           ++ td' "invisible" "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
     , (td' "Yes" "Recommended Track"
-           ++ td "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
+           +. td' "invisible" "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
     , (td' "Maybe" "Maybe Track"
-          ++ td "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
+          +. td' "invisible" "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
     , (td' "No" "Avoid"
-          ++ td "These episodes are only recommended if you're truly curious and dedicated.")
+          +. td' "invisible" "These episodes are only recommended if you're truly curious and dedicated.")
     ]
     +. "</table>"
     +. p "Additionally, some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes."
     +. p "Many of the early episodes are missing. You will be able to tell which ones these are because the name of the story will be in italics, and it will be mentioned several times. These stories aren't unwatchable, surprisingly - reconstructions of the episodes have been made, and they are (relatively) watchable. If you don't want to watch the reconstuctions, though (and I don't blame you), they are easy to skip."
     +. p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
     +. p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
+    +. div "dimbox" (
+      h3 "Important note"
+      +. p "The early doctor who episodes are <i>excruciatingly</i> slow compared to what we see on modern TV, so I've judged them less harshly on pacing. <strong>I won't blame you for skipping the black and white episodes</strong>"
+      +. p "I think my ratings for the black and white episodes are also the ones which have generated the most controversy - fans want me to rate more of them higher, average people think I should rate more of them lower."
+      )
     +. "<hr>"
 
 outro :: String
@@ -313,5 +341,6 @@ outro = "<hr>"
           +. "</ul>"
           +. p ("This guide was not created manually, but was (somewhat) automated with a program I made one afternoon. You can find the source for it " ++  a "https://github.com/AveryGlitch/Doctor-Who-Guide" "on my github")
         )
+        +. div "return" (p $ a "../" "Return Home")
 
 
