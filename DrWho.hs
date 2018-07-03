@@ -121,11 +121,13 @@ outputSeason (Season num stories)
 outputStory :: Story -> String
 outputStory (Story name number numEps missing recc note synopsis review)
   = tr' "name"
-    (td
+    (td' (if missing == None then "name" else "name-missing")
         ("<p class="
          ++ (if missing == None then "name" else "name-missing")
          ++ ">" ++ name ++ "</p>"
+         ++ (if missing /= None then div "reconstruction" "Reconstruction" else "")
          +. "<table>"
+         -- +. (if missing /= None then tr' "info" (td' "reconstruction" "Reconstruction") else "")
          +. tr' "info" (td "Story Number" ++ td (show number))
          +. tr' "info" (td "Number of Episodes" ++ td (show numEps))
          +. case missing of
@@ -133,20 +135,25 @@ outputStory (Story name number numEps missing recc note synopsis review)
               All  -> tr' "info" (td "Missing Episodes?" ++ td "Yes: all")
               Some eps -> tr' "info" (td "Missing Episodes?" ++ td ("Yes: " ++ showEps eps))
          +. "</table>\n")
-    +. td (div (show recc)
-            (
-              (case recc of
-                 Highly -> "✨ Highly Recommended ✨"
-                 Yes    -> "Watch"
-                 Maybe  -> "Maybe"
-                 Partial-> "Partial watch"
-                 No     -> "Don't watch"
-              )
-              ++ (case note of
-                    Just text -> ", " ++ text
-                    Nothing   -> ""
-                 )
+    +. td ("<table class=recc>"
+          -- +. (if missing /= None then tr' "recc" (td $ div "reconstruction" "Reconstruction") else "")
+          +. tr' "recc"
+            (td $ div (show recc)
+             (
+               (case recc of
+                  Highly -> "✨ Highly Recommended ✨"
+                  Yes    -> "Watch"
+                  Maybe  -> "Maybe"
+                  Partial-> "Partial watch"
+                  No     -> "Don't watch"
+               )
+               ++ (case note of
+                     Just text -> ", " ++ text
+                     Nothing   -> ""
+                  )
+             )
             )
+            +. "</table>"
           )
     +. td ("<table class=details>"
            +. tr' "details" (td' "details-tag" "Synopsis" ++ td' "details-text" synopsis)
