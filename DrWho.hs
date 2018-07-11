@@ -149,7 +149,7 @@ output table = preamble +. introduction +. output' table +. outro +. postamble
 
 outputSeason :: Season -> String
 outputSeason (Season num stories)
-  = tr' "season" ("<td colspan=3>Season " ++ num ++ "</td>")
+  = tr' "season" ("<td colspan=3>" ++ "<a name=\"season-" ++ num ++ "\"></a>Season " ++ num ++ "</td>")
     +. concatMap outputStory stories
 
 outputStory :: Story -> String
