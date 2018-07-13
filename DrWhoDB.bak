@@ -12,6 +12,7 @@
       review: The last 3 episodes of this story are dry and difficult to watch. They
         have several repeated scenes, and the plot is not very interesting
       number: 1
+      timesCaptured: 3
     - numEpisodes: 7
       reccomendation: 'No'
       note: this story is incredibly slow paced, so I can't recommend it, unless you
@@ -23,6 +24,7 @@
         by a mutated race of people known as The Daleks
       review: The main cast is fleshed out a lot in this story, and there is a lot
         of tension. But the pace is excruciatingly slow.
+      timesCaptured: 3
       number: 2
     - numEpisodes: 2
       reccomendation: Maybe
@@ -37,7 +39,7 @@
       number: 3
     - numEpisodes: 7
       reccomendation: Maybe
-      note: if you're ok with a reconstruction
+      note: if you're ok with a reconstruction (Note - this story contains actors in yellowface)
       missing:
         tag: All
       name: Marco Polo
@@ -49,6 +51,7 @@
         face are more personal. Not much action - which means the lack of video isn't
         a problem.
       number: 4
+      timesCaptured: 6
     - numEpisodes: 6
       reccomendation: Highly
       note: null
@@ -61,6 +64,7 @@
         works very very well, and mitigates a lot of the pacing issues the early seasons
         had. However the script was rushed, and you can tell.
       number: 5
+      timesCaptured: 6
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -286,4 +290,15 @@
       review: Not an awful story, and would be a 'Maybe' if it weren't for the fact
         that it's a reconstruction, and very difficult to watch.
       number: 22
+    - numEpisodes: 4
+      reccomendation: 'Yes'
+      note: null
+      missing:
+        tag: None
+      name: The Ark
+      synopsis: The Doctor, Steven, and Dodo land on a ship carrying humanity
+        to a new home... but accidentally bring the common cold, which
+        turns out to be fatal...
+      review: A very good story from the claissic era
+      number: 23
     seasonNum: '3'
