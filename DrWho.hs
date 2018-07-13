@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module DrWho where
 
+--test
 import System.Environment (getArgs)
 import System.Directory (renameFile)
 import Prelude hiding (div)
@@ -42,7 +43,7 @@ outputSeason (Season num stories)
     +. concatMap outputStory stories
 
 outputStory :: Story -> String
-outputStory (Story name number numEps missing recc note synopsis review)
+outputStory (Story name number numEps missing recc note synopsis review majorPlotChanges)
   = tr' "name"
     (td' (if missing == None then "name" else "name-missing")
         ("<p class="
@@ -75,6 +76,13 @@ outputStory (Story name number numEps missing recc note synopsis review)
     +. td ("<table class=details>"
            +. tr' "details" (td' "details-tag" "Synopsis" ++ td' "details-text" synopsis)
            +. tr' "details" (td' "details-tag" "Review"   ++ td' "details-text" review)
+           +. (case majorPlotChanges of
+                 Just changes -> tr' "details" (td' "details-tag" "Major Plot Changes"
+                                                ++ td' "details-text"
+                                                (simplehtml "details" $
+                                                 (simplehtml "summary" "Click to reveal") ++ changes))
+                 Nothing -> ""
+              )
            +. "</table>"))
     ++ "\n"
 
@@ -159,7 +167,7 @@ run AddStory _ table  = do season <- prompt "Season Number: "
                            note <- prompt "Note: "
                            synopsis <- prompt "Synopsis: "
                            review <- prompt "Review: "
-                           let result = addStory (Story name (read number) (read numEpisodes) (read missing) (read recommendation) (readNote note) synopsis review) season table
+                           let result = addStory (Story name (read number) (read numEpisodes) (read missing) (read recommendation) (readNote note) synopsis review Nothing) season table
                            case result of
                              Just newTable -> do writeOut newTable
                              Nothing       -> print "couldn't add story!"
@@ -186,7 +194,7 @@ prompt :: String -> IO String
 prompt text = putStr text >> getLine >>= return
 
 file, tmpfile, backup :: FilePath
-file = "DrWhoDB"
+file = "DrWhoDB.yaml"
 tmpfile = "DrWhoDB_tmp"
 backup = "DrWhoDB.bak"
 

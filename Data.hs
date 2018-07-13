@@ -41,6 +41,7 @@ data Story  = Story
   , note           :: (Maybe Note)
   , synopsis       :: Synopsis
   , review         :: Review
+  , majorPlotChanges :: Maybe String
 } deriving (Generic, Show, Read)
 -- A story is either missing no episodes, all episodes, or some specific episodes
 data Missing = None

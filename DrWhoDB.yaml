@@ -12,6 +12,8 @@
       review: The last 3 episodes of this story are dry and difficult to watch. They
         have several repeated scenes, and the plot is not very interesting
       number: 1
+      majorPlotChanges: The Doctor, his grand-daughter Susan, Barbara, and Ian are
+        all introduced in this story
     - numEpisodes: 7
       reccomendation: 'No'
       note: this story is incredibly slow paced, so I can't recommend it, unless you
@@ -24,6 +26,7 @@
       review: The main cast is fleshed out a lot in this story, and there is a lot
         of tension. But the pace is excruciatingly slow.
       number: 2
+      majorPlotChanges: The Daleks are introduced
     - numEpisodes: 2
       reccomendation: Maybe
       note: null
@@ -35,6 +38,7 @@
       review: Very tense and mysterious episodes - however the second episode drags
         on a bit, and plot contrivances force everyone to act out of character
       number: 3
+      majorPlotChanges: null
     - numEpisodes: 7
       reccomendation: Maybe
       note: if you're ok with a reconstruction (Note - this story contains actors
@@ -50,6 +54,7 @@
         face are more personal. Not much action - which means the lack of video isn't
         a problem.
       number: 4
+      majorPlotChanges: null
     - numEpisodes: 6
       reccomendation: Highly
       note: null
@@ -62,6 +67,7 @@
         works very very well, and mitigates a lot of the pacing issues the early seasons
         had. However the script was rushed, and you can tell.
       number: 5
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -75,6 +81,7 @@
         of the situation that it can hardly be called that at all. However, it is
         a very interesting plot.
       number: 6
+      majorPlotChanges: This story introduces the concept of fixed points in time
     - numEpisodes: 6
       reccomendation: Maybe
       note: it is very interesting, but also very slow.
@@ -86,6 +93,7 @@
       review: The Tardis lands on a ship, trapped in orbit around a planet of Psychic
         aliens known as the Sensorites
       number: 7
+      majorPlotChanges: null
     - numEpisodes: 6
       reccomendation: 'Yes'
       note: but note there are missing episodes, which makes it harder to get through
@@ -102,6 +110,7 @@
         footage are a slog to get through - without the motion, the pacing is more
         obviously slow
       number: 8
+      majorPlotChanges: null
     seasonNum: '1'
   - stories:
     - numEpisodes: 3
@@ -115,6 +124,7 @@
       review: Entertaining and fun, and a good start to the second season - although
         some of the actors give rather stilted performances
       number: 9
+      majorPlotChanges: null
     - numEpisodes: 6
       reccomendation: Maybe
       note: it's good, just be warned of the usual slowness
@@ -127,6 +137,7 @@
         pacing is still incredibly slow. Definitely more worth a watch than many of
         the other early stories, which is why it gets a Watch recommendation
       number: 10
+      majorPlotChanges: Susan leaves the TARDIS to marry a man she met, and help humanity to rebuild. The Doctor says a very heartfelt fairwell, and that scene alone is definitely worth watching.
     - numEpisodes: 2
       reccomendation: Highly
       note: null
@@ -138,6 +149,7 @@
       review: Very short, and quite interesting. It introduces a new regular cast
         member, and does so quite well!
       number: 11
+      majorPlotChanges: Vicki, a young crewmember of a crashed spaceship, joins the TARDIS crew.
     - numEpisodes: 4
       reccomendation: Highly
       note: null
@@ -149,6 +161,7 @@
       review: Very, very good! And notable for using quite a lot of humour, which
         makes it stand out from the episodes around it
       number: 12
+      majorPlotChanges: null
     - numEpisodes: 6
       reccomendation: 'No'
       note: null
@@ -162,6 +175,7 @@
         It's a shame - the concept is good, and they clearly put a lot of effort into
         making an alien planet with the sets and costumes.
       number: 13
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: despite the reconstructions
@@ -177,6 +191,7 @@
         episodes are, of course, harder to watch, but the other episodes in this story
         make up for it in spades.
       number: 14
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -187,6 +202,7 @@
         have to fight against the clock to avoid a horrible fate
       review: An all-round decent story
       number: 15
+      majorPlotChanges: null
     - numEpisodes: 6
       reccomendation: 'Yes'
       note: null
@@ -197,6 +213,7 @@
         time and space by the daleks
       review: An important story, that is told well
       number: 16
+      majorPlotChanges: Barbara and Ian are sick of travelling with the Doctor, and want to go home. They take the dalek time machine and return back to Earth, to continue their lives. Steven, a human who had been imprisoned on the planet, manages to get into the TARDIS just before it dematerialises.
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -207,6 +224,7 @@
         anachronistic artifacts abound...
       review: I like this story, even if it is a bit slow.
       number: 17
+      majorPlotChanges: The Time Meddling Monk is introduced, as well as the idea that there are other people with TARDISes.
     seasonNum: '2'
   - stories:
     - numEpisodes: 4
@@ -227,6 +245,7 @@
         well, especially considering how little surviving footage they had to work
         with.'
       number: 18
+      majorPlotChanges: null
     - numEpisodes: 1
       reccomendation: 'Yes'
       note: if you're willing to watch a reconstruction
@@ -239,6 +258,7 @@
         or any companions at all. It's  worth a watch, just for the sheer uniqueness
         of it.
       number: 19
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'No'
       note: null
@@ -251,6 +271,7 @@
         unbelievably dense, and then Vicki falls for one and runs off with him. I
         had trouble suspending my disbelief for this one.
       number: 20
+      majorPlotChanges: Vicki stays with a warrior from Troy, to help him rebuild. (As I mentioned above, I did not find this a particularly realistic or interesting way for the character to be written out). As she leaves, she sends Katarina, a handmaiden, into the TARDIS to help the Doctor.
     - numEpisodes: 12
       reccomendation: Partial
       note: don't watch episode 7 ("The Feast of Steven"). (Note - this story contains
@@ -276,6 +297,7 @@
         scheduled to be broadcast on Christmas Day. It doesn't tie in to the actual
         plot, and is basically just a farcical interlude
       number: 21
+      majorPlotChanges: Katarina is killed while saving the Doctor from an assailant (the first death of a companion in the series). Sara Kingdom, a former guard of Mavic Chen, joins the Doctor for a while, but she too meets her end. The story concludes with the Doctor and Steven lamenting their deaths.
     - numEpisodes: 4
       reccomendation: 'No'
       note: null
@@ -287,6 +309,7 @@
       review: Not an awful story, and would be a 'Maybe' if it weren't for the fact
         that it's a reconstruction, and very difficult to watch.
       number: 22
+      majorPlotChanges: Dodo Chaplet, the descendent of one of the characters in Paris, joins the TARDIS while it makes a pit-stop in 1960s london.
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -298,6 +321,7 @@
         fatal...
       review: A very good story from the claissic era
       number: 23
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'No'
       note: null
@@ -312,6 +336,7 @@
         to play his games to earn their freedom
       review: Really just garbage.
       number: 24
+      majorPlotChanges: null
     - numEpisodes: 4
       reccomendation: 'Yes'
       note: null
@@ -321,4 +346,5 @@
       synopsis: The Doctor is mistaken for Doc Holiday, a famous outlaw in the wild west
       review: Not much to say - a solid story, and fun to watch.
       number: 25
+      majorPlotChanges: null
     seasonNum: '3'

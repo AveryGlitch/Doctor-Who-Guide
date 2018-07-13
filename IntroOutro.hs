@@ -6,28 +6,27 @@ import Prelude hiding (div)
 introduction :: String
 introduction
   = h1 "Avery's Doctor Who Guide"
-    +. p "So, you want to watch Doctor Who, through the classic and modern era, but you're not so sure on how much to watch? You've come to the right place! This guide has several different tracks, depending on what you're interested in"
+    +. p "So, you want to watch Classic Doctor Who but you're not so sure on how much to watch? You've come to the right place! This guide has several different tracks depending on what you're interested in:"
     +. "<table>"
     +. concatMap (tr' "intro")
     [
       (td' "Highly" "Fast Track"
            ++ td' "invisible" "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
     , (td' "Yes" "Recommended Track"
-           +. td' "invisible" "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
+           +. td' "invisible" ("For most people: watch both the Fast Track episodes and the Recommended episodes. You'll get quite a lot of Doctor Who, without having to sit through the slower stuff."
+                               +. "<br>" +. "Some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes.")
+      )
     , (td' "Maybe" "Maybe Track"
-          +. td' "invisible" "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
+          +. td' "invisible" "If you're interested in a more thorough watch, you can also watch the episodes on the maybe track. These aren't neccesarily bad episodes, just ones that are hard to recommend.")
     , (td' "No" "Avoid"
           +. td' "invisible" "These episodes are only recommended if you're truly curious and dedicated.")
     ]
     +. "</table>"
-    +. p "Additionally, some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes."
-    +. p "Many of the early episodes are missing. You will be able to tell which ones these are because the name of the story will be in italics, and it will be mentioned several times. These stories aren't unwatchable, surprisingly - reconstructions of the episodes have been made, and they are (relatively) watchable. If you don't want to watch the reconstuctions, though (and I don't blame you), they are easy to skip."
-    +. p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
     +. p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
     +. div "dimbox" (
       h3 "Important note"
-      +. p "The early doctor who episodes are <i>excruciatingly</i> slow compared to what we see on modern TV, so I've judged them less harshly on pacing. <strong>I won't blame you for skipping the black and white episodes</strong>"
-      +. p "I think my ratings for the black and white episodes are also the ones which have generated the most controversy - fans want me to rate more of them higher, average people think I should rate more of them lower."
+      +. p "A lot of the black and white episodes were destroyed by the BBC, so all that remains of them is fan reconstructions. The reconstructions are well made, however they can be hard to watch - don't make yourself sit through them if you're having trouble with them."
+      +. p "The reconstructions are clearly marked, so you should be able to tell which ones they are."
       )
 
 outro :: String
