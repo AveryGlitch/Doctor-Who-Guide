@@ -7,124 +7,13 @@ import System.Directory (renameFile)
 import Prelude hiding (div)
 import qualified Data.Yaml as Yaml
 import qualified Data.ByteString as ByteString
-import GHC.Generics
 import System.IO (hSetBuffering, stdin, stdout, BufferMode (..))
 
-
--- First some types to make signatures more readable
-type Name = String
-type Note = String
-type Synopsis = String
-type Review = String
-type NumEpisodes = Int
-type Number = Int
-type DoctorNum = Int
-type SeasonNum = String
+import Data
+import HTML
+import IntroOutro
 
 
--- Our Table is just a list of Doctors...
-type Table  = [Doctor]
--- A Doctor is just a number and a list of seasons...
-data Doctor = Doctor
-  {
-    doctorNum :: DoctorNum
-  , seasons   :: [Season]
-  } deriving (Generic, Show, Read)
--- A Season is just a season number* and a list of stories
-data Season = Season
-  {
-    seasonNum :: SeasonNum
-  , stories   :: [Story]
-  } deriving (Generic, Show, Read)
--- A story contains a bunch of info!
-data Story  = Story
-  {
-    name           :: Name
-  , number         :: Number
-  , numEpisodes    :: NumEpisodes
-  , missing        :: Missing
-  , reccomendation :: Recommendation
-  , note           :: (Maybe Note)
-  , synopsis       :: Synopsis
-  , review         :: Review
-} deriving (Generic, Show, Read)
--- A story is either missing no episodes, all episodes, or some specific episodes
-data Missing = None
-             | All
-             | Some [Int] deriving (Generic, Show, Read, Eq)
--- Our recommendations
-data Recommendation = Highly | Yes | Maybe | Partial | No deriving (Generic, Show, Read)
-
-instance Yaml.ToJSON Doctor
-instance Yaml.ToJSON Season
-instance Yaml.ToJSON Story
-instance Yaml.ToJSON Missing
-instance Yaml.ToJSON Recommendation
-
-instance Yaml.FromJSON Doctor
-instance Yaml.FromJSON Season
-instance Yaml.FromJSON Story
-instance Yaml.FromJSON Missing
-instance Yaml.FromJSON Recommendation
-
-
--- an empty table.
-emptyTable :: Table
-emptyTable = []
-
-
--- | Checks if a certain doctor is in the table
-hasDoctor :: DoctorNum -> Table -> Bool
-hasDoctor _ [] = False
-hasDoctor n (Doctor n' _ : rest) = n == n' || hasDoctor n rest
-
-
--- | Checks if a certain season is in the table
-hasSeason :: SeasonNum -> Table -> Bool
-hasSeason _ [] = False
-hasSeason n (Doctor _ seasons : rest) = any (\(Season n' _) -> n == n') seasons || hasSeason n rest
-
-
--- | Tells you what the last doctor is (by number)
-getLastDoctor :: Table -> DoctorNum
-getLastDoctor [] = 0
-getLastDoctor table = case last table of
-                        Doctor n _ -> n
-
-
--- | Adds another Doctor to the table
-addDoctor :: Table -> Table
-addDoctor table = let nextDoctor = getLastDoctor table + 1
-                  in table ++ [Doctor nextDoctor []]
-
-
--- | Adds a new season to the table. Requires both a doctor number and a season number
-addSeason :: DoctorNum -> SeasonNum -> Table -> Maybe Table
-addSeason doctorNum seasonNum table = if hasDoctor doctorNum table then Just (addSeason' doctorNum seasonNum table)
-                                                                   else Nothing
-  where
-    addSeason' :: DoctorNum -> SeasonNum -> Table -> Table
-    addSeason' _ _ [] = error "impossible"
-    addSeason' doctorNum seasonNum (Doctor n seasons : rest)
-      = if n == doctorNum
-        then Doctor n (seasons ++ [Season seasonNum []]) : rest
-        else Doctor n seasons : addSeason' doctorNum seasonNum rest
-
-
--- | Adds a story to a specific season in the table
-addStory :: Story -> SeasonNum -> Table -> Maybe Table
-addStory story season table = if hasSeason season table then Just (addStory' story season table)
-                                                        else Nothing
-  where
-    addStory' story season [] = error "impossible"
-    addStory' story season (Doctor n seasons : rest)
-      = if any (\s -> case s of Season n' _ -> season == n') seasons
-        then (Doctor n (addToSeason story season seasons)) : rest
-        else Doctor n seasons : addStory' story season rest
-    addToSeason story season [] = error "impossible"
-    addToSeason story season (Season sn stories : rest)
-      | sn == season = Season sn (stories ++ [story]) : rest
-      | otherwise    = Season sn stories : (addToSeason story season rest)
 
 
 
@@ -137,7 +26,7 @@ postamble = "</body></html>"
 tableHeading = "<table class=\"maintable\"><tr><th>Story</th><th>Watch?</th><th>Details</th></tr>\n"
 
 output :: Table -> String
-output table = preamble +. introduction +. output' table +. outro +. postamble
+output table = preamble +. introduction +. toc table +. "<hr>" +. output' table +. outro +. postamble
   where
     output' [] = ""
     output' (Doctor n seasons : rest)
@@ -220,12 +109,18 @@ ordinal n = case n of
 
 toc :: Table -> String
 toc [] = ""
-toc table = h1 "Table of Contents"
-            +. "<ol>" +. toc' table +. "</ol>"
-            +. "<hr>"
+toc table = div "dimbox" $
+                "<details>" +. simplehtml "summary" "Table of Contents"
+                +. "<ol>" +. toc' table +. "</ol>"
+                +. "</details>"
   where
     toc' [] = ""
-    toc' (Doctor n _ : rest) = li $ a ("#doctor" ++ show n) (ordinal n ++ " Doctor")
+    toc' (Doctor n seasons : rest) = li $ a ("#doctor" ++ show n) (ordinal n ++ " Doctor")
+                                     +. simplehtml "ul" (tocSeasons seasons)
+                                     +. toc' rest
+    tocSeasons [] = ""
+    tocSeasons (Season n _ : rest) = li $ a ("#season-" ++ n) ("Season " ++ n)
+                                     +. tocSeasons rest
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -305,80 +200,3 @@ writeOut :: Table -> IO ()
 writeOut table = do ByteString.writeFile tmpfile (Yaml.encode table)
                     renameFile file backup
                     renameFile tmpfile file
-
--- | Concats two strings, but puts a newline between them
-(+.) :: String -> String -> String
-x +. y = x ++ "\n" ++ y
-
-h1, h2, h3, p, tr, td, li :: String -> String
-h1  = simplehtml "h1"
-h2  = simplehtml "h2"
-h3  = simplehtml "h2"
-p   = simplehtml "p"
-tr  = simplehtml "tr"
-td  = simplehtml "td"
-li  = simplehtml "li"
-tr', td', div :: String -> String -> String
-tr' = styledhtml "tr"
-td' = styledhtml "td"
-div = styledhtml "div"
-
-a :: String -> String -> String
-a link name = "<a href=\"" ++ link ++ "\">" ++ name ++ "</a>"
-
-img :: String -> String -> String
-img url alt = "<img src=\"" ++ url ++ "\" alt=\"" ++ alt ++ "\">"
-
-
-simplehtml :: String -> (String -> String)
-simplehtml tag = \s -> "<" ++ tag ++ ">" ++ s ++ "</" ++ tag ++ ">"
-styledhtml :: String -> String -> (String -> String)
-styledhtml tag style = \s -> "<" ++ tag ++ " class=\"" ++ style ++ "\">"++ s ++ "</" ++ tag ++ ">"
-
-
-
-
-introduction :: String
-introduction
-  = h1 "Avery's Doctor Who Guide"
-    +. p "So, you want to watch Doctor Who, through the classic and modern era, but you're not so sure on how much to watch? You've come to the right place! This guide has several different tracks, depending on what you're interested in"
-    +. "<table>"
-    +. concatMap (tr' "intro")
-    [
-      (td' "Highly" "Fast Track"
-           ++ td' "invisible" "The Highly recommended episodes. If you only want a small sampling of episodes, look here!")
-    , (td' "Yes" "Recommended Track"
-           +. td' "invisible" "For most people, you'll want to stick on the Recommended track - watch both the Fast track episodes and the recommended episodes (don't forget the partials, see the next section), and you'll get quite a lot of Doctor Who, without having to sit through the slower stuff.")
-    , (td' "Maybe" "Maybe Track"
-          +. td' "invisible" "If you're interested in a more thorough watch through, you can also watch the episodes on the maybe track. These aren't bad episodes by any right - they're just not neccessary to watch")
-    , (td' "No" "Avoid"
-          +. td' "invisible" "These episodes are only recommended if you're truly curious and dedicated.")
-    ]
-    +. "</table>"
-    +. p "Additionally, some stories are marked as a <span class=Partial>partial watch</span> - this means you <strong>should</strong> watch it, but not all of it - just certain episodes."
-    +. p "Many of the early episodes are missing. You will be able to tell which ones these are because the name of the story will be in italics, and it will be mentioned several times. These stories aren't unwatchable, surprisingly - reconstructions of the episodes have been made, and they are (relatively) watchable. If you don't want to watch the reconstuctions, though (and I don't blame you), they are easy to skip."
-    +. p "\"Wait, but what if I want to watch <strong>everything</strong>?\" go ahead! There's nothing stopping you. But this guide is for people who want a more selective sampling of the series, or for those who will watch every episode, you can use this guide as a litmus test."
-    +. p "This guide is currently a work in progress, and only goes as far as I've watched so far. I started watching through the episodes for this guide in early May 2018, and I'm still going strong."
-    +. div "dimbox" (
-      h3 "Important note"
-      +. p "The early doctor who episodes are <i>excruciatingly</i> slow compared to what we see on modern TV, so I've judged them less harshly on pacing. <strong>I won't blame you for skipping the black and white episodes</strong>"
-      +. p "I think my ratings for the black and white episodes are also the ones which have generated the most controversy - fans want me to rate more of them higher, average people think I should rate more of them lower."
-      )
-    +. "<hr>"
-
-outro :: String
-outro = "<hr>"
-        +. div "dimbox" (
-          h3 "Acknowledgements"
-          +. p "Thanks to:"
-          +. "<ul>"
-          +. li (a "https://mastodon.social/@The_T" "@The_T@mastodon.social" ++ " for convincing me to upgrade the recommendations for The Aztecs, The Sensorites, and The Reign of Terror; as well as downgrading The Edge of Destruction")
-          +. li (a "https://computerfairi.es/@nezumi" "@nezumi@computerfairi.es" ++ " for making the downgrade of The Edge of Destruction more solid, by pointing out how the plot contrivances make everyone act out of character")
-          +. li (a "https://wandering.shop/@DialMForMara" "@DialMForMara@wandering.shop" ++ " for convincing me to review the reconstructions as well")
-          +. li "And a bunch of others on the fediverse for helping me make the colourscheme in this document less garish."
-          +. "</ul>"
-          +. p ("This guide was not created manually, but was (somewhat) automated with a program I made one afternoon. You can find the source for it " ++  a "https://notabug.org/AveryLychee/Doctor-Who-Guide" "on NotABug")
-        )
-        +. div "return" (p $ a "../" "Return Home")
-
-
